@@ -1,0 +1,62 @@
+CONTENT.TXT - a memory crunched formatting of content for O1PRSNT 
+>> you must stay inside the constraint of 52x22 for content, lines longer will be truncated   <<
+>> each slide starts and ends with "---" on a line by itself                                  <<
+>> the first line of each slide contains the first on screen line to be utilized (skip until) <<
+>> the first character of each line is justification (L,C,R), or indent (I), or bullet (B)    <<
+>> put the title of your presentation on line 12, limited to 40 characters                    <<
+>> line 13 should remain blank                                                                <<
+>>                                                                                            <<
+>>52char   1         2         3         4         5                                          <<
+>>1234567890123456789012345678901234567890123456789012                                        <<
+>>                                                                                            <<
+Osborne 1 Presentation Test
+nn
+---
+7
+C OSBORNE 1 PRESENTATION TEST
+---
+---
+1
+L Slide 2: Basic Navigation
+I This slide demonstrates:
+B Title with hanging indent
+B Body text formatting
+B Keyboard navigation
+---
+---
+1
+L Slide 3: Memory Management
+L
+L This slide shows:
+B Subtitle with body text
+I that indents but you might want to use an
+I   extra couple of spaces at the start
+L 
+L 
+R ... funny tag line
+---
+---
+1
+L Full Coverage Slide Test
+L          1         2         3         4         5
+L 1234567890123456789012345678901234567890123456789012
+L 4
+L 5
+L 6
+L 7
+L 8
+L 9
+L 10
+L 11
+L 12
+L 13
+L 14
+L 15
+L 16
+L 17
+L 18
+L 19
+L 20
+L 21
+L 22
+---
