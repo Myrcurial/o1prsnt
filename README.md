@@ -52,21 +52,6 @@ o1prsnt/
 
 ## Development
 
-### Building from Source
-
-```bash
-# Process slides
-./o1prsnt/scripts/process-slides.sh ~/Documents/Presentations/mypresentation.txt CONTENT.TXT
-
-# Copy to disk image
-./o1prsnt/scripts/copy-to-disk.sh CONTENT.TXT my_presentation_floppy.IMD
-
-# Test in emulator
-# (Load assets/disks/presentation.imd in MAME)
-QQQQQ
-
-```
-
 ### Repository Workflow
 
 This project uses a branch-based workflow:
