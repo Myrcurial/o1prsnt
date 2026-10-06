@@ -84,9 +84,9 @@
 450 NEXT I%
 455 REM
 460 REM These two or three lines are the footer - see line 471
-465 PRINT "______________________________________________________________"
+465 PRINT "____________________________________________________"
 470 PRINT TITLE$; CS%; "/"; TS%;
-471 PRINT " " : REM - Remove this line if you're using a composite to HDMI adapter with overscan issues.
+471 PRINT " "; : REM - Trailing semicolon is load-bearing: a newline on row 24 scrolls the screen and eats the slide top line.
 475 REM
 480 REM --- DCD/CTS Switch Polling ---
 481 KEY$ = INKEY$ : IF KEY$ <> "" THEN GOTO 600 : REM Keyboard backup

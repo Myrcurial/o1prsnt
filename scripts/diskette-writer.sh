@@ -152,7 +152,7 @@ if hdmi:
                   '440   PRINT FSL$(I%) : REM  - Now lightning fast as it formats an entire slide at once rather than the whole presentation')
     replace_exact('460 REM These two or three lines are the footer - see line 471',
                   '460 REM These three lines are the footer')
-    replace_exact('471 PRINT " " : REM - Remove this line if you\'re using a composite to HDMI adapter with overscan issues.',
+    replace_exact('471 PRINT " "; : REM - Trailing semicolon is load-bearing: a newline on row 24 scrolls the screen and eats the slide top line.',
                   '471 PRINT " "')
     print('variant: hdmi (21 display rows)')
 
