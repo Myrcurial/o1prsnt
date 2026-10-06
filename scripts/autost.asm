@@ -111,9 +111,6 @@ logo:
 	db	'               Trust your technolust.',cr,lf
 	db	cr,lf
 	db	'        https://github.com/Myrcurial/o1prsnt',cr,lf
-	db	cr,lf
-	db	'    Thanks Lee, 45 years later, I did the work,',cr,lf
-	db	'                      but you were the inspiration.',cr,lf
 	db	cr,lf,'$'
 end
 
