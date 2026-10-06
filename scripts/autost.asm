@@ -90,7 +90,7 @@ filename:	db	18,'MBASIC O1PRSNT.BAS',0
 ;
 startgr:	db	clear,'$'
 stopgr:		db	'$'
-endmes:		db	cr,lf,9,'Loading O1PRSNT...','$'
+endmes:		db	cr,lf,'                 Loading O1PRSNT...','$'
 ;					/
 ;				  message to print under logo
 ;
@@ -111,10 +111,7 @@ logo:
 	db	'               Trust your technolust.',cr,lf
 	db	cr,lf
 	db	'        https://github.com/Myrcurial/o1prsnt',cr,lf
-	db	cr,lf
-	db	'    Thanks Lee, 45 years later, I did the work,',cr,lf
-	db	'                      but you were the inspiration.',cr,lf
-	db	cr,lf,'$'
+	db	'$'
 end
 
 
