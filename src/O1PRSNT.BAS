@@ -199,18 +199,18 @@
 2740 END
 2800 REM --- Interactive Jump to Slide ---
 2802 PRINT CHR$(26):PRINT " ":PRINT " ":PRINT " ":PRINT " ":PRINT " "
-2805 PRINT "Jump to Slide: "; KEY$; : K1$ = KEY$
+2805 PRINT "Jump to Slide: "; KEY$; : Z0$ = KEY$ : REM Start the accumulator with the first digit
 2810 K2$ = INPUT$(1)
 2815 IF K2$ = CHR$(13) THEN GOTO 2850 : REM Enter pressed, proceed to VAL
 2820 IF K2$ < "0" OR K2$ > "9" THEN GOTO 2810 : REM Ignore non-numeric
-2825 Z0$ = K1$ + K2$ : PRINT K2$; : REM Append and echo to screen
-2830 IF LEN(Z0$) < 3 THEN GOTO 2810 : REM Get more digits if under 3
+2825 Z0$ = Z0$ + K2$ : PRINT K2$; : REM Append digit and echo to screen
+2830 IF LEN(Z0$) < 3 THEN GOTO 2810 : REM Up to 3 digits; CR ends entry early
 2850 Z1% = VAL(Z0$)
 2855 IF Z1% < 1 THEN Z1% = 1
 2860 IF Z1% > TS% THEN Z1% = TS%
 2865 CS% = Z1% : LS% = 0 : REM Clear LS% to force a re-render of the new slide
 2870 PRINT " ":PRINT "Jumping to new slide location"; CS%
-2880 RETURN
+2880 KEY$ = "" : RETURN : REM Clear KEY$ so a jump to the last slide is just a slide
 2900 PRINT CHR$(26)
 2910 PRINT "Presentation Complete."
 2920 PRINT "Press R to restart or any key to end"
