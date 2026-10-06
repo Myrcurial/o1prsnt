@@ -10,7 +10,8 @@
 ; This program loads and executes MBASIC with O1PRSNT.BAS
 ;
 ; Modified for o1prsnt (Osborne 1 presentation software) --
-; original AUTOCPM.ASM loads SuperCalc.
+; original AUTOCPM.ASM loads SuperCalc. The Osborne graphics logo
+; has been replaced with the o1prsnt ASCII splash banner (plain text).
 ;
 ;------------------------------------------------
 ;
@@ -35,16 +36,11 @@ lf	equ	0ah	;line feed
 	sui	16h	;subtract 16 to find CCP
 	mov	h,a	;put back new page boundary
 	shld	ccp	;store it
-	lxi	d,logo	;point to logo
-	lxi 	b,2047	;number of characters in logo
-over:	ldax	d	;get byte of logo
-	sui	65	;convert to graphics
-	stax	d	;store it
-	inx	d	;new address
-	dcx	b	;decrement byte counter
-	mov	a,b	;ggt in A
-	ora	a	;are we done?
-	jnz	over	;if no, back again
+;
+; NOTE: the original AUTOCPM converted an ASCII logo into Osborne graphics
+; characters here (sui 65 over 2047 bytes). The o1prsnt banner is plain text,
+; so no conversion is needed -- it is printed exactly as stored below.
+;
 start:	lxi	d,startgr	;point to startgraphics
 	call	print
 	lxi	d,logo		;point to logo message
@@ -92,55 +88,33 @@ filename:	db	18,'MBASIC O1PRSNT.BAS',0
 ;	you must change "lxe b,10" just before MOVE: to
 ;	"lxi b,length+2"
 ;
-startgr:	db	clear
-		db	escape,graph,'$'
-stopgr:		db	escape,nograph,'$'
-endmes:		db	cr,lf,lf,lf,9,'Loading O1PRSNT...',cr,lf,lf,'$'
+startgr:	db	clear,'$'
+stopgr:		db	'$'
+endmes:		db	cr,lf,9,'Loading O1PRSNT...','$'
 ;					/
 ;				  message to print under logo
 ;
-logo:	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaaKWWWWWWWWWWWWWWWWWWWWI'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'Iaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaKWWWWWWZaaaaaaaaaaVWWWWW'
-	db	'WIaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'YYaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaWWWWWWWaaaaaaaaaaaaWWWWW'
-	db	'WWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'YYaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaWWWWWWWaaaaaaaaaaaaWWWWW'
-	db	'WWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'YYaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaWWWWWWWaaaaaaaaaaaaWWWWW'
-	db	'WWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'YYaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaVWWWWWWIaaaaaaaaaaKWWWWW'
-	db	'WZaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-	db	'Zaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaaVWWWWWWWWWWWWWWWWWWWWZ'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-	db	'aaaaaaaaaaaaaaaaaaaaaaaaaaaa$'
+logo:
+	db	cr,lf
+	db	'    ____       __',cr,lf
+	db	'   / __ \_____/ /_  ____  _________  ___',cr,lf
+	db	'  / / / / ___/ __ \/ __ \/ ___/ __ \/ _ \',cr,lf
+	db	' / /_/ (__  ) /_/ / /_/ / /  / / / /  __/',cr,lf
+	db	' \____/____/_.___/\____/_/  /_/ /_/\___/',cr,lf
+	db	'    / __ \________  ________  ____  / /____  _____',cr,lf
+	db	'   / /_/ / ___/ _ \/ ___/ _ \/ __ \/ __/ _ \/ ___/',cr,lf
+	db	'  / ____/ /  /  __(__  )  __/ / / / /_/  __/ /',cr,lf
+	db	' /_/   /_/   \___/____/\___/_/ /_/\__/\___/_/',cr,lf
+	db	cr,lf
+	db	'             We do what we do...',cr,lf
+	db	'                    ...because we must.',cr,lf
+	db	'               Trust your technolust.',cr,lf
+	db	cr,lf
+	db	'        https://github.com/Myrcurial/o1prsnt',cr,lf
+	db	cr,lf
+	db	'    Thanks Lee, 45 years later, I did the work,',cr,lf
+	db	'                      but you were the inspiration.',cr,lf
+	db	cr,lf,'$'
 end
 
 
