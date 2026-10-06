@@ -26,6 +26,7 @@ This software was created for a presentation at **NaClCon** where one of the spe
 - **Memory management** slide content is loaded from diskette while running, hundreds of slides possible
 - **Auto-start capability** via AUTOST.COM
 - **Slide counter** display (nn/yy format)
+- **Countdown timer slides** - a `T MM:SS` content line runs a centred countdown that starts when the slide appears, beeps at 0:00, and auto-advances
 
 ## Technical Specifications
 
