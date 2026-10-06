@@ -194,9 +194,13 @@ if not H.wait_for("Loading O1PRSNT", 60) then
   print("TEST FAIL: AUTOST load message never appeared")
   H.finish(1)
 end
-if not H.wait_for("Press any key", 120) then
-  print("TEST FAIL: splash screen never appeared")
-  H.finish(1)
+-- full builds show the splash ("Press any key"); --autost/--no-splash builds
+-- skip it and land directly on slide 1's footer ("1 / N") -- accept either.
+if not H.wait_for("Press any key", 30) then
+  if not H.wait_for(" / ", 240) then
+    print("TEST FAIL: neither splash screen nor first slide appeared")
+    H.finish(1)
+  end
 end
 print("TEST PASS: AUTOST.COM booted straight into o1prsnt")
 H.finish(0)

@@ -25,7 +25,7 @@
 145 DIM TMR% : REM Screen row (1-22) where the countdown is displayed
 146 DIM TR% : REM Countdown seconds remaining
 147 DIM DL% : REM Delay-loop calibration count for a ~1 second tick
-148 DIM CA% : REM 1 = update countdown in place (ESC=), 0 = repaint whole slide
+148 DIM CA% : REM 1 = update countdown in place (VRAM POKEs), 0 = repaint whole slide
 150 REM Set up the hardware now 
 152 POKE 10752, 3 : REM Master Reset the ACIA
 154 POKE 10752, 17 : REM Set 8-N-1 and divide-by-16 clock
@@ -287,8 +287,8 @@
 4110 GOSUB 3700 : REM B$ = centred time string
 4120 FSL$(TMR%) = B$ : REM Keep the slide cache in sync for repaints
 4130 IF CA% = 0 THEN RETURN : REM Cache only - the main loop repaints
-4140 PRINT CHR$(27); "="; CHR$(30 + TMR%); CHR$(51); : REM Position cursor at the countdown row
-4145 PRINT MID$(B$, 20, 14); : REM Fixed 14-char centred window - never reaches column 52
+4140 B2$ = MID$(B$, 20, 14) + SPACE$(14) : FOR I% = 1 TO 14 : POKE 61458 + (TMR% - 1) * 128 + I%, ASC(MID$(B2$, I%, 1)) : NEXT I% : REM POKE the 14-char time window straight into VRAM row TMR% col 19 (B$ is not padded, so pad the window first)
+4145 REM Direct VRAM writes replace the old ESC= cursor-position PRINT - no console paint, no flicker, no column-52 risk
 4150 RETURN
 4200 REM --- Time is up: beep, hold, then auto-advance ---
 4210 PRINT CHR$(7); : REM Console bell, if the BIOS supports it
