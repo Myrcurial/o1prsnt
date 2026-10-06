@@ -33,6 +33,12 @@ RUN_LUA="/tmp/o1test.$$.lua"
 trap 'rm -f "$RUN_LUA"' EXIT
 cat "$HARNESS_DIR/o1harness.lua" "$TEST" > "$RUN_LUA"
 
+# MAME writes cfg/ and snap/ directories into the current directory; run from
+# a neutral location so neither your repo nor your home dir collects litter.
+RUNDIR="${O1_RUNDIR:-$(dirname "$ROMPATH")}"
+[ -d "$RUNDIR" ] || RUNDIR="/tmp"
+cd "$RUNDIR"
+
 SDL_VIDEODRIVER=dummy mame osborne1 \
   -flop1 "$IMAGE" \
   -video none -sound none -nothrottle \
