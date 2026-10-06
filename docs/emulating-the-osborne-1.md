@@ -10,7 +10,8 @@ brew install mame
 You'll need ROMs -- you can get them here: https://archive.org/details/osborne-1-roms
    - occ-7a3007-00-reva.rom
    - occ-v1.44.rom
-put them in the `roms` directory that you'll use as the root of your Osborne 1 emulation adventure.
+
+Keep the ROM files in a zip archive named `osborne1.zip` inside the `roms` folder -- MAME loads machine ROMs from `<rompath>/<machine>.zip`, so the final location should be `~/Documents/Osborne1/roms/osborne1.zip`.
 
 ## Install Floppy Diskette Tools
 
@@ -70,3 +71,7 @@ converting a hardware floppy emulator image (HFE) to an emulator floppy image (I
 ## Launching MAME
 
 `cd ~/Documents/Osborne1; mame osborne1 -flop1 ~/Documents/Osborne1/floppies/o1prsnt.imd`
+
+## MAME weirdnesses... 
+
+MAME puts itself into full screen mode whenever it launches. To get out of the full screen, use the LEFT Option key and Return. Once you've done that, hit the red circle to quit - the Cmd-Q is not honoured (despite what it says!)
