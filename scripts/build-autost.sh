@@ -57,6 +57,9 @@ cpmls -f osborne1 "$SYSTEM_IMAGE" | grep -q "load.com" || { echo "error: LOAD.CO
 echo "build-autost: source=$ASM_SRC"
 echo "build-autost: system image=$SYSTEM_IMAGE"
 
+# run MAME from a neutral directory so its cfg/snap litter doesn't land in the repo
+cd "$O1DIR"
+
 WORK="$(mktemp -d /tmp/o1autost.XXXXXX)"
 trap 'rm -rf "$WORK"' EXIT
 
