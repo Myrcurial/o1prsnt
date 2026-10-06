@@ -2,7 +2,7 @@
 # diskette-writer.sh -- build a bootable o1prsnt floppy image (.imd).
 #
 # Usage:
-#   ./diskette-writer.sh [--autost] [--hdmi] [--strip] [--no-splash]
+#   ./diskette-writer.sh [--autost] [--hdmi] [--hdmi-note] [--strip] [--no-splash]
 #                        [--src-image FILE] [--basic FILE] [--content FILE]
 #                        [--out FILE]
 #
@@ -14,6 +14,10 @@
 #                one row lower (composite->HDMI converters crop the top and
 #                bottom screen lines); the build fails if any slide's content
 #                would reach past row 21
+#   --hdmi-note  with --hdmi: instead of failing on an over-long slide,
+#                truncate the overflowing line(s) (max 3) and append a note
+#                slide at rows 17-21 in the rightmost 40 columns explaining
+#                the 21-line HDMI content limit
 #   --autost     install autost.com so the presentation self-starts at boot,
 #                AND generate the no-splash variant of the program (the
 #                AUTOST.COM banner is already on screen -- no need to show
@@ -42,6 +46,7 @@ CONTENT_FILE="$REPO_ROOT/examples/CONTENT.TXT"
 OUT="$O1DIR/floppies/o1prsnt.imd"
 AUTOST=0
 HDMI=0
+HDMINOTE=0
 STRIP=0
 NOSPLASH=0
 
@@ -49,6 +54,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --autost)    AUTOST=1; shift;;
     --hdmi)      HDMI=1; shift;;
+    --hdmi-note) HDMINOTE=1; shift;;
     --strip)     STRIP=1; shift;;
     --no-splash) NOSPLASH=1; shift;;
     --src-image) SRC_IMAGE="$2"; shift 2;;
@@ -211,10 +217,22 @@ PYEOF
 # begins on row 2) and no slide may use past row 21.
 CONTENT_USE="$CONTENT_FILE"
 if [ "$HDMI" -eq 1 ]; then
-python3 - "$CONTENT_FILE" "$WORK/CONTENT.TXT" << 'PYEOF'
+CONTENTFLAGS=()
+[ "$HDMINOTE" -eq 1 ] && CONTENTFLAGS=(--hdmi-note)
+python3 - "$CONTENT_FILE" "$WORK/CONTENT.TXT" ${CONTENTFLAGS[@]+"${CONTENTFLAGS[@]}"} << 'PYEOF'
 import sys, re
 
 src, dst = sys.argv[1], sys.argv[2]
+NOTE_ON_OVERFLOW = '--hdmi-note' in sys.argv[3:]
+MAX_OVER = 3
+NOTE_SLIDE = [
+    'L             +--------------------------------------+',
+    'L             | NOTE: slides using the --hdmi        |',
+    'L             | modifier are limited to 21 lines of  |',
+    'L             | content (rows 2-21 on screen).       |',
+    'L             |                                      |',
+    'L             +--------------------------------------+',
+]
 text = open(src, newline='').read()
 lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 while lines and lines[-1] == '':
@@ -222,31 +240,45 @@ while lines and lines[-1] == '':
 
 out = list(lines)
 errors = []
-i, n, slide = 0, len(lines), 0
-while i < n:
-    if lines[i] != '---':
+i, slide = 0, 0
+while i < len(out):
+    if out[i] != '---':
         i += 1
         continue
     slide += 1
-    if i + 1 >= n:
+    if i + 1 >= len(out):
         errors.append(f'slide {slide}: missing start-row line')
         break
-    m = re.match(r'^\s*(\d+)\s*$', lines[i + 1])
+    m = re.match(r'^\s*(\d+)\s*$', out[i + 1])
     if not m:
-        errors.append(f"slide {slide}: start-row line {lines[i+1]!r} is not a plain number")
+        errors.append(f"slide {slide}: start-row line {out[i+1]!r} is not a plain number")
         i += 1
         continue
     fl = int(m.group(1))
     j = i + 2
-    while j < n and lines[j] != '---':
+    while j < len(out) and out[j] != '---':
         j += 1
-    if j >= n:
+    if j >= len(out):
         errors.append(f"slide {slide}: missing closing '---'")
         break
     count = j - (i + 2)
     newfl = fl + 1
     last = newfl + count - 1
     if last > 21:
+        # default: hard fail. With --hdmi-note (and only then) an over-long
+        # slide is truncated to fit and the deck gains a 6-line note slide,
+        # starting at row 17 and drawn in the rightmost 40 columns, explaining
+        # the 21-line HDMI limit (used by the repo's example deck).
+        if NOTE_ON_OVERFLOW and last - 21 <= MAX_OVER:
+            del out[i + 2 + (21 - newfl + 1):j]
+            j = i + 2 + (21 - newfl + 1)
+            # j is slide 4's closing separator; the note slide goes right after
+            # it: note open, start row, 6 note lines, note close. Resume on the
+            # separator after that (the next slide's own opening separator).
+            out[j + 1:j + 1] = ['---', '17'] + NOTE_SLIDE + ['---']
+            print(f'note: slide {slide}: truncated {last - 21} line(s) beyond row 21 (--hdmi-note)')
+            i = j + 1 + 2 + len(NOTE_SLIDE) + 1
+            continue
         errors.append(f'slide {slide}: content would span rows {newfl}..{last}; '
                       f'HDMI shows rows 2-21 ({last - 21} line(s) would be cropped)')
     out[i + 1] = str(newfl)

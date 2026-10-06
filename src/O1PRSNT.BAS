@@ -161,7 +161,7 @@
 1510 OPEN "I", #1, "CONTENT.TXT"
 1512 FOR K% = 1 TO ST%(CS%) : LINE INPUT #1, A$ : NEXT K%:REM Fast forward through to the current start line 
 1514 FOR K% = 1 TO 22 : SL$(K%)="": NEXT K% : REM clear the previous slides' worth of content
-1515 TM% = 0 : TMR% = 0 : REM Reset countdown state whenever a slide is loaded
+1515 TM% = 0 : TMR% = 0 : TL% = 0 : TB% = 0 : REM Reset countdown state whenever a slide is loaded
 1516 LINE INPUT #1, A$
 1518 FL%=VAL(A$)
 1520 K%=FL%
@@ -172,11 +172,18 @@
 1560   K% = K% + 1
 1570 WEND
 1580 CLOSE #1
+1581 IF TB% = 0 THEN GOTO 1585 : REM No countdown timer on this slide
+1582 IF TB% <= 20 THEN GOTO 1585 : REM Timer row already inside the box-safe range
+1583 FOR K% = 22 TO TB% + 1 STEP -1 : SL$(K%) = SL$(K% - 1) : NEXT K% : REM Shift T..end up by one row
+1584 SL$(TB%) = "" : TB% = TB% - 1 : REM Fill the vacated row; timer now sits one row higher
 1585 IF FRE(0) < 1500 THEN X = FRE(0)
+1586 FOR K% = 1 TO 22 : IF LEFT$(SL$(K%), 1) = "T" THEN TL% = K% : TB% = K% : REM Record the countdown timer row for the box
+1587 NEXT K%
 1590 REM --- SUB: Format Current Slide into Cache ---
 1600 FOR K% = 1 TO 22
 1620   GOSUB 3000 : REM Your existing formatter
 1630   FSL$(K%) = B$ : REM Store the 52-char result
+1632   IF TL% > 0 AND K% <> TL% AND K% >= TB% - 1 AND K% <= TL% + 1 THEN FSL$(K%) = "" : REM Box: blank the rows around a countdown timer
 1640 NEXT K%
 1650 RETURN
 2000 REM
