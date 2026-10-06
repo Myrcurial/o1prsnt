@@ -20,12 +20,17 @@
 
 ## Slide Format
 
-The presentation source uses a simple markdown-like format:
-   - you must stay inside the constraint of 52x22 (or 80x22 / 104x22 if using the expanded modes) for content, lines longer will be truncated
-   - each slide starts and ends with "---" on a line by itself
-   - the first line of each slide contains the first on screen line to be utilized (skip until)
-   - the first character of each line is justification (L,C,R), indent (I), bullet (B), or countdown timer (T)
-   
+The presentation source uses a simple markdown-like format. **Line numbers are positional** — the program reads them by absolute position in the file, so they cannot shift:
+
+- **Lines 1–11** — header / comment block (skipped entirely by the program). Free text; `CONTENT.TXT` uses this space for its own usage notes and a 52-column ruler.
+- **Line 12** — the presentation title. Truncated to the leftmost 40 characters and shown in the footer of every slide.
+- **Line 13** — must be blank.
+- **Line 14 onward** — the slides, each delimited by `---` on a line by itself:
+  - the first line after an opening `---` is the slide's start row on screen (integer 1–22)
+  - each content line's first character is a format code: `L` (left), `C` (centre), `R` (right), `I` (indent 4), `B` (bullet), or `T` (countdown timer, e.g. `T 0:10`)
+  - content must fit the 52×22 window (start row + lines − 1 ≤ 22); lines longer than 52 characters are truncated
+  - with the `--hdmi` build, content must fit rows 2–21 (21 lines max); see `scripts/diskette-writer.sh --hdmi-note`
+
 ## Countdown Timer Slides
 
 A content line starting with `T` runs a countdown timer on that slide:
