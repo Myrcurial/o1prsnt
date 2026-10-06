@@ -10,7 +10,10 @@
 # on the fly from it (src/o1prsnt-hdmi.bas is no longer stored):
 #
 #   --hdmi       generate the HDMI-adapter variant: 21 display rows instead
-#                of 22 (the 22nd row has overscan issues on composite->HDMI)
+#                of 22, and CONTENT.TXT is rewritten so every slide starts
+#                one row lower (composite->HDMI converters crop the top and
+#                bottom screen lines); the build fails if any slide's content
+#                would reach past row 21
 #   --autost     install autost.com so the presentation self-starts at boot,
 #                AND generate the no-splash variant of the program (the
 #                AUTOST.COM banner is already on screen -- no need to show
@@ -202,6 +205,66 @@ with open(dst, 'w', newline='') as f:
     f.write('\r\n'.join(lines) + '\r\n')
 PYEOF
 
+# --- HDMI content transform ------------------------------------------------------
+# Composite->HDMI converters crop the top and bottom display lines, so with the
+# 21-row HDMI program variant every slide's start row is shifted +1 (content
+# begins on row 2) and no slide may use past row 21.
+CONTENT_USE="$CONTENT_FILE"
+if [ "$HDMI" -eq 1 ]; then
+python3 - "$CONTENT_FILE" "$WORK/CONTENT.TXT" << 'PYEOF'
+import sys, re
+
+src, dst = sys.argv[1], sys.argv[2]
+text = open(src, newline='').read()
+lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+while lines and lines[-1] == '':
+    lines.pop()
+
+out = list(lines)
+errors = []
+i, n, slide = 0, len(lines), 0
+while i < n:
+    if lines[i] != '---':
+        i += 1
+        continue
+    slide += 1
+    if i + 1 >= n:
+        errors.append(f'slide {slide}: missing start-row line')
+        break
+    m = re.match(r'^\s*(\d+)\s*$', lines[i + 1])
+    if not m:
+        errors.append(f"slide {slide}: start-row line {lines[i+1]!r} is not a plain number")
+        i += 1
+        continue
+    fl = int(m.group(1))
+    j = i + 2
+    while j < n and lines[j] != '---':
+        j += 1
+    if j >= n:
+        errors.append(f"slide {slide}: missing closing '---'")
+        break
+    count = j - (i + 2)
+    newfl = fl + 1
+    last = newfl + count - 1
+    if last > 21:
+        errors.append(f'slide {slide}: content would span rows {newfl}..{last}; '
+                      f'HDMI shows rows 2-21 ({last - 21} line(s) would be cropped)')
+    out[i + 1] = str(newfl)
+    i = j + 1
+
+if errors:
+    for e in errors:
+        print('error:', e)
+    print('error: HDMI content transform failed -- trim the listed slides and retry')
+    sys.exit(1)
+
+with open(dst, 'w', newline='') as f:
+    f.write('\r\n'.join(out) + '\r\n')
+print(f'variant: hdmi content ({slide} slides re-rowed to start one line lower, all within rows 2-21)')
+PYEOF
+CONTENT_USE="$WORK/CONTENT.TXT"
+fi
+
 # --- build the image -------------------------------------------------------------
 mkdir -p "$(dirname "$OUT")"
 cp "$SRC_IMAGE" "$OUT"
@@ -209,14 +272,14 @@ for f in O1PRSNT.BAS CONTENT.TXT AUTOST.COM; do
   cpmrm -f osborne1 "$OUT" "0:$f" 2>/dev/null || true
 done
 cpmcp -f osborne1 "$OUT" "$GEN" 0:O1PRSNT.BAS
-cpmcp -f osborne1 "$OUT" "$CONTENT_FILE" 0:CONTENT.TXT
+cpmcp -f osborne1 "$OUT" "$CONTENT_USE" 0:CONTENT.TXT
 if [ "$AUTOST" -eq 1 ]; then
   cpmcp -f osborne1 "$OUT" "$AUTOST_FILE" 0:AUTOST.COM
 fi
 
 echo "diskette-writer: wrote $OUT"
 echo "  master  : $BASIC_FILE"
-echo "  content : $CONTENT_FILE"
+echo "  content : $CONTENT_FILE$([ "$HDMI" -eq 1 ] && echo ' (rows shifted +1)' || echo '')"
 echo "  autost  : $([ "$AUTOST" -eq 1 ] && echo "$AUTOST_FILE" || echo 'not installed')"
 echo
 echo "image contents:"
