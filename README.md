@@ -39,13 +39,13 @@ This software was created for a presentation at **NaClCon** where one of the spe
 
 ```
 o1prsnt/
-├── src/                    # Source code (MBASIC programs)
-├─scripts/                # Utility scripts for development
+├── src/                    # Source code (O1PRSNT.BAS master + autost.com)
+├── scripts/                # Build & utility scripts (diskette writer, validators, AUTOST builder)
 ├── docs/                   # Documentation
-├── config/                 # Configuration files
+├── utilities/              # Headless MAME testing harness (Lua)
 ├── assets/
 │   └── disks/             # Disk images (.IMD files)
-├── examples/              # Sample presentation content
+├── examples/              # Sample presentation content (CONTENT.TXT)
 └── README.md              # This file
 ```
 
@@ -62,17 +62,22 @@ This project uses a branch-based workflow:
 
 ### Utilities
 
-- **Slide Processor**: Converts markdown-like format to optimized text file
-- **REM Stripper**: Removes REM statements to minimize memory usage
-- **CP/M Tools Scripts**: Simplify file transfer to/from disk images
+Scripts live in `scripts/` (all take `--help`):
+
+- **validate-emulator.sh** – checks for mame, cpmtools, ROMs, and the preferred `~/Documents/Osborne1` layout
+- **presentation-validator.sh** – validates slide source against the rules the BASIC parser enforces and writes a CRLF `CONTENT.TXT`
+- **diskette-writer.sh** – builds a bootable `.imd` from `mbasic.imd` + the program + content; generates HDMI (`--hdmi`), no-splash (`--no-splash`, implied by `--autost`), and REM-stripped (`--strip`) program variants on the fly from the single stored master `src/O1PRSNT.BAS`
+- **diskette-converter.sh** – `disk-analyse` wrapper for `--imd2hfe` / `--hfe2imd`
+- **build-autost.sh** – assembles `AUTOST.COM` from `scripts/autost.asm` using the authentic CP/M `ASM.COM`/`LOAD.COM` inside the emulator (see `utilities/headless-testing-harness/` for the test framework it uses)
 
 ## Hardware Requirements
 
-No requirements beyond standard Osborne 1 configuration are necessary. If using a composite to HDMI adapter, limit your slides to only 21 lines.
+No requirements beyond standard Osborne 1 configuration are necessary. If using a composite to HDMI adapter, limit your slides to only 21 lines -- `diskette-writer.sh --hdmi` generates that variant of the program for you.
 
 ## Testing
 
 - **Emulator**: Primary development on MAME with OCC1 ROM v1.44
+- **Headless automation**: `utilities/headless-testing-harness` drives MAME from Lua scripts -- injecting keystrokes and reading the emulated screen straight from video RAM -- for end-to-end tests; `scripts/build-autost.sh` even uses it to assemble AUTOST.COM with the authentic CP/M toolchain
 - **Hardware**: Periodic testing on actual Osborne 1 hardware
 - **File Format**: Hard CR line endings required for CP/M compatibility
 
@@ -104,8 +109,8 @@ This project is released for educational and historical preservation purposes.
 ## Resources
 
 - [Osborne 1 User's Reference Guide](https://bitsavers.trailing-edge.com/pdf/osborne/osborne1/Osborne_1_Users_Reference_Guide_1981.pdf)
-- [Osborne 1 Technical Manual](docs/Osborne1_Technical_Manual.pdf)
-- [Osborne 1 Field Service Manual](docs/Osborne1_Service_Manual.pdf)
+- [Osborne 1 Technical Manual](https://bitsavers.trailing-edge.com/pdf/osborne/osborne1/2F00153-01_Osborne1TechnicalManual_1982.pdf) (1982, bitsavers; too large to bundle in the repo)
+- [Osborne 1 Field Service Manual](https://bitsavers.trailing-edge.com/pdf/osborne/2F00040-00_Service2ndEdition_1983.pdf) (2nd Edition, 1983, bitsavers)
 - [CP/M Operating System Documentation](https://www.cpm.z80.de/)
 
 ## Contact
@@ -114,4 +119,6 @@ For questions or collaboration, please open an issue on GitHub.
 
 ---
 
-*"The Osborne 1 was the first portable computer, and 45 years later, it can still deliver presentations!"*
+*"The Osborne 1 was the first portable computer, and 45 years later, it can still deliver presentations!"*[^1]
+
+[^1]: Since Jamie is now Head of Trust and Infrastructure at Cline Bot, many of these recent changes were completed with the help of the Cline harness and Kimi K3 - you should try Cline at [https://cline.bot](https://cline.bot)!

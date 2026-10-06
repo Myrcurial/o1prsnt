@@ -8,7 +8,7 @@
 
 ## Running the Presentation
 
-1. Download the latest release `.IMD` disk image
+1. Download the latest release `.IMD` disk image -- or build your own with `../scripts/diskette-writer.sh` (validate your environment first with `../scripts/validate-emulator.sh`)
 2. Load the disk image in your Osborne 1 emulator or transfer to physical media
 3. Boot the Osborne 1 - optionally the presentation will auto-start via `AUTOST.COM`
 4. Use keyboard controls:
