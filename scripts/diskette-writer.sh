@@ -219,7 +219,7 @@ CONTENT_USE="$CONTENT_FILE"
 if [ "$HDMI" -eq 1 ]; then
 CONTENTFLAGS=()
 [ "$HDMINOTE" -eq 1 ] && CONTENTFLAGS=(--hdmi-note)
-python3 - "$CONTENT_FILE" "$WORK/CONTENT.TXT" "${CONTENTFLAGS[@]}" << 'PYEOF'
+python3 - "$CONTENT_FILE" "$WORK/CONTENT.TXT" ${CONTENTFLAGS[@]+"${CONTENTFLAGS[@]}"} << 'PYEOF'
 import sys, re
 
 src, dst = sys.argv[1], sys.argv[2]
