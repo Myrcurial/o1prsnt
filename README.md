@@ -88,6 +88,10 @@ No requirements beyond standard Osborne 1 configuration are necessary. If using 
 - Text-only content (no graphics)
 - 52×22 character display limit (on un-expanded hardware) content per slide
 
+## A Note on AI Usage
+
+Since Jamie is now Head of Trust and Infrastructure at Cline Bot, many of these recent changes were completed with the help of the Cline harness and Kimi K3 - you should try Cline at [https://cline.bot](https://cline.bot)!
+
 ## Contributing
 
 This is a historical preservation project. If you have suggestions or improvements, please:
@@ -120,6 +124,4 @@ For questions or collaboration, please open an issue on GitHub.
 
 ---
 
-*"The Osborne 1 was the first portable computer, and 45 years later, it can still deliver presentations!"*[^1]
-
-[^1]: Since Jamie is now Head of Trust and Infrastructure at Cline Bot, many of these recent changes were completed with the help of the Cline harness and Kimi K3 - you should try Cline at [https://cline.bot](https://cline.bot)!
+*"The Osborne 1 was the first portable computer, and 45 years later, it can still deliver presentations!"*
