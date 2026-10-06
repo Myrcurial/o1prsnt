@@ -2,7 +2,7 @@ CONTENT.TXT - a memory crunched formatting of content for O1PRSNT
 >> you must stay inside the constraint of 52x22 for content, lines longer will be truncated   <<
 >> each slide starts and ends with "---" on a line by itself                                  <<
 >> the first line of each slide contains the first on screen line to be utilized (skip until) <<
->> the first character of each line is justification (L,C,R), or indent (I), or bullet (B)    <<
+>> the first character of each line is justify (L,C,R), indent (I), bullet (B), timer (T)   <<
 >> put the title of your presentation on line 12, limited to 40 characters                    <<
 >> line 13 should remain blank                                                                <<
 >>                                                                                            <<
@@ -59,4 +59,12 @@ L 19
 L 20
 L 21
 L 22
+---
+---
+4
+C COUNTDOWN TIMER TEST
+L
+L A centred 10 second countdown runs below.
+L At 0:00 it beeps and advances by itself.
+T 0:10
 ---

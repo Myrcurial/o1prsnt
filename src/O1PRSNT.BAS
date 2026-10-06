@@ -21,9 +21,16 @@
 138 DIM TS% : REM Total Slide count loaded from CONTENT.TXT
 140 DIM STLN% : REM The start line for the slide content
 142 REM We can't dimension the Slide array until we have input from CONTENT.TXT see 1050 DIM SL$(TS%,22)
+144 DIM TM% : REM Countdown timer total seconds on current slide (0 = no timer)
+145 DIM TMR% : REM Screen row (1-22) where the countdown is displayed
+146 DIM TR% : REM Countdown seconds remaining
+147 DIM DL% : REM Delay-loop calibration count for a ~1 second tick
+148 DIM CA% : REM 1 = update countdown in place (ESC=), 0 = repaint whole slide
 150 REM Set up the hardware now 
 152 POKE 10752, 3 : REM Master Reset the ACIA
 154 POKE 10752, 17 : REM Set 8-N-1 and divide-by-16 clock
+155 DL% = 95 : REM ~1 second tick, calibrated on MAME osborne1 (BIOS 1.44) - fine-tune per docs/using-o1prsnt.md
+157 CA% = 1 : REM Set to 0 if the countdown lands on the wrong row on your display
 199 REM
 200 REM Initialize slides and initiate main counter
 201 REM =====================
@@ -83,10 +90,11 @@
 475 REM
 480 REM --- DCD/CTS Switch Polling ---
 481 KEY$ = INKEY$ : IF KEY$ <> "" THEN GOTO 600 : REM Keyboard backup
-482 RS% = PEEK(10752)
-483 IF (RS% AND 4) = 4 THEN KEY$ = "N" : GOTO 500 : REM Bit 2 (DCD) is High
-484 IF (RS% AND 8) = 8 THEN KEY$ = "P" : GOTO 500 : REM Bit 3 (CTS) is High
-485 GOTO 481
+482 IF TM% > 0 THEN GOSUB 4000 : GOTO 600 : REM Countdown timer slide - the timer polls input
+483 RS% = PEEK(10752)
+484 IF (RS% AND 4) = 4 THEN KEY$ = "N" : GOTO 500 : REM Bit 2 (DCD) is High
+485 IF (RS% AND 8) = 8 THEN KEY$ = "P" : GOTO 500 : REM Bit 3 (CTS) is High
+486 GOTO 481
 490 REM
 500 REM --- Debounce: Wait for switch release ---
 501 RS% = PEEK(10752)
@@ -99,7 +107,7 @@
 650 IF KEY$ = "R" OR KEY$ = "r" THEN GOSUB 2500:REM Restart with currentslide=1
 670 IF KEY$ = "Q" OR KEY$ = "q" THEN GOSUB 2700:REM Quit directly
 680 IF KEY$ >= "0" AND KEY$ <= "9" THEN GOSUB 2800 : REM Handle "jump to slide"
-900 IF CS% = TS% THEN GOSUB 2900:REM You're at the end of the deck, start over or exit?
+900 IF CS% = TS% AND KEY$ <> "" THEN GOSUB 2900:REM You're at the end of the deck, start over or exit?
 920 GOTO 400: You've hit any other key so we redisplay the current slide and wait for input.
 995 REM 
 996 REM End of main loop, the GOTO on line 920 causes the loop
@@ -153,6 +161,7 @@
 1510 OPEN "I", #1, "CONTENT.TXT"
 1512 FOR K% = 1 TO ST%(CS%) : LINE INPUT #1, A$ : NEXT K%:REM Fast forward through to the current start line 
 1514 FOR K% = 1 TO 22 : SL$(K%)="": NEXT K% : REM clear the previous slides' worth of content
+1515 TM% = 0 : TMR% = 0 : REM Reset countdown state whenever a slide is loaded
 1516 LINE INPUT #1, A$
 1518 FL%=VAL(A$)
 1520 K%=FL%
@@ -224,6 +233,7 @@
 3050 IF F$ = "R" THEN GOSUB 3300:REM Right justify
 3055 IF F$ = "I" THEN GOSUB 3400:REM Indent
 3060 IF F$ = "B" THEN GOSUB 3500:REM Bullet
+3062 IF F$ = "T" THEN GOSUB 3600:REM Countdown timer
 3065 RETURN
 3100 REM Center text
 3105 P% = (52 - LEN(T$)) / 2
@@ -242,4 +252,52 @@
 3500 REM Bullet (substitute "  - " for first character)
 3505 B$ = LEFT$("  - " + T$, 52)
 3510 RETURN
+3600 REM --- Parse countdown timer line "T MM:SS" ---
+3601 REM T$ holds MM:SS (or bare minutes), K% is this line's screen row
+3605 C1% = INSTR(T$, ":")
+3610 IF C1% > 0 THEN TM% = VAL(LEFT$(T$, C1% - 1)) * 60 + VAL(MID$(T$, C1% + 1)) ELSE TM% = VAL(T$) * 60
+3620 TMR% = K% : TR% = TM%
+3630 GOSUB 3700 : REM B$ = centred initial time, caller stores it in FSL$(K%)
+3640 RETURN
+3700 REM --- Format TR% seconds as centred M:SS into B$ ---
+3710 M2% = TR% \ 60 : S2% = TR% MOD 60
+3720 T2$ = MID$(STR$(M2%), 2) + ":"
+3730 IF S2% < 10 THEN T2$ = T2$ + "0"
+3740 T2$ = T2$ + MID$(STR$(S2%), 2)
+3750 P2% = (52 - LEN(T2$)) / 2
+3760 B$ = LEFT$(SPACE$(P2%) + T2$, 52)
+3770 RETURN
+4000 REM --- Countdown timer: runs while TM% > 0 on the current slide ---
+4001 REM In: TR% seconds remaining, TMR% display row. Out: KEY$ for dispatch at 600
+4010 GOSUB 4100 : REM Show the current time remaining
+4020 IF TR% <= 0 THEN GOTO 4200 : REM Time is up
+4030 FOR D% = 1 TO DL% : REM One second tick (calibrate DL%)
+4040   KEY$ = INKEY$ : RS% = PEEK(10752)
+4050   IF KEY$ <> "" THEN D% = DL%
+4060   IF (RS% AND 12) <> 0 THEN D% = DL%
+4080 NEXT D%
+4085 IF KEY$ = "" AND (RS% AND 4) = 4 THEN KEY$ = "N"
+4086 IF KEY$ = "" AND (RS% AND 8) = 8 THEN KEY$ = "P"
+4087 IF (RS% AND 12) <> 0 THEN GOSUB 4300 : REM Debounce the foot switch
+4090 IF KEY$ <> "" THEN RETURN : REM Presenter input wins
+4092 TR% = TR% - 1
+4094 IF CA% = 0 THEN KEY$ = "" : RETURN : REM Repaint mode - main loop redraws
+4096 GOTO 4010
+4100 REM --- Update the countdown display ---
+4110 GOSUB 3700 : REM B$ = centred time string
+4120 FSL$(TMR%) = B$ : REM Keep the slide cache in sync for repaints
+4130 IF CA% = 0 THEN RETURN : REM Cache only - the main loop repaints
+4140 PRINT CHR$(27); "="; CHR$(30 + TMR%); CHR$(51); : REM Position cursor at the countdown row
+4145 PRINT MID$(B$, 20, 14); : REM Fixed 14-char centred window - never reaches column 52
+4150 RETURN
+4200 REM --- Time is up: beep, hold, then auto-advance ---
+4210 PRINT CHR$(7); : REM Console bell, if the BIOS supports it
+4220 POKE 11266, PEEK(11266) OR 32 : REM Beeper on - video PIA port B bit 5 (&H2C02)
+4230 FOR D% = 1 TO DL% \ 2 : NEXT D% : REM Beep duration ~0.5 second
+4240 POKE 11266, PEEK(11266) AND 223 : REM Beeper off, preserving the scroll bits
+4250 FOR D% = 1 TO DL% : NEXT D% : REM Dwell so 0:00 is seen before advancing
+4260 KEY$ = "N" : RETURN : REM Advance just like the N key
+4300 REM --- Serial debounce: wait for switch release ---
+4310 RS% = PEEK(10752) : IF (RS% AND 12) <> 0 THEN GOTO 4310
+4320 RETURN
 9999 REM Reminder that line numbers are limited to 4 digits and file must be CRLF and have a blank line without a line number at the end!
