@@ -62,9 +62,13 @@ This project uses a branch-based workflow:
 
 ### Utilities
 
-- **Slide Processor**: Converts markdown-like format to optimized text file
-- **REM Stripper**: Removes REM statements to minimize memory usage
-- **CP/M Tools Scripts**: Simplify file transfer to/from disk images
+Scripts live in `scripts/` (all take `--help`):
+
+- **validate-emulator.sh** – checks for mame, cpmtools, ROMs, and the preferred `~/Documents/Osborne1` layout
+- **presentation-validator.sh** – validates slide source against the rules the BASIC parser enforces and writes a CRLF `CONTENT.TXT`
+- **diskette-writer.sh** – builds a bootable `.imd` from `mbasic.imd` + the program + content; generates HDMI (`--hdmi`), no-splash (`--no-splash`, implied by `--autost`), and REM-stripped (`--strip`) program variants on the fly from the single stored master `src/O1PRSNT.BAS`
+- **diskette-converter.sh** – `disk-analyse` wrapper for `--imd2hfe` / `--hfe2imd`
+- **build-autost.sh** – assembles `AUTOST.COM` from `scripts/autost.asm` using the authentic CP/M `ASM.COM`/`LOAD.COM` inside the emulator (see `utilities/headless-testing-harness/` for the test framework it uses)
 
 ## Hardware Requirements
 
