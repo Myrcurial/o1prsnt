@@ -29,7 +29,7 @@
 150 REM Set up the hardware now 
 152 POKE 10752, 3 : REM Master Reset the ACIA
 154 POKE 10752, 17 : REM Set 8-N-1 and divide-by-16 clock
-155 DL% = 95 : REM ~1 second tick, calibrated on MAME osborne1 (BIOS 1.44) - fine-tune per docs/using-o1prsnt.md
+155 DL% = 95 : REM ~1 second tick - CALIBRATE PER MACHINE with utilities/tickcal (MAME BIOS 1.44 = 95; real hardware ~60 and varies by revision). See docs/using-o1prsnt.md
 157 CA% = 1 : REM Set to 0 if the countdown lands on the wrong row on your display
 199 REM
 200 REM Initialize slides and initiate main counter

@@ -48,18 +48,28 @@ T 8:00
 
 ### Calibrating the timer
 
-The Osborne 1 has no real-time clock, so the countdown uses a calibrated delay loop.
-Line 155 of `src/O1PRSNT.BAS` sets `DL%`, the loop count per second (initial guess 300).
+The Osborne 1 has no real-time clock, so the countdown uses a calibrated delay
+loop: line 155 of `src/O1PRSNT.BAS` sets `DL%`, the loop iterations per
+nominal second.
 
-To calibrate: add a test slide with `T 1:00`, time it with a stopwatch from the moment
-the slide appears until the beep, then compute `DL% = 300 * 60 / measured_seconds`
-and update line 155. MAME runs the Z80 at the true 4 MHz, so a value calibrated in
-the emulator transfers to real hardware.
+**The correct value is machine-dependent — calibrate it on every machine you
+present on.** MAME (osborne1, BIOS 1.44) ticks correctly at `DL% = 95`, but
+real hardware runs the same loop at a different speed (on one machine a 1:00
+countdown took 1:33, i.e. `DL%` ≈ 60), and the value may vary between
+Osborne 1 hardware revisions.
+
+Use the TICKCAL utility (`utilities/tickcal/TICKCAL.BAS`, see its README):
+it ticks once per loop with a bell and a flashing block. Nudge with `n`/`b`
+(±1) or `N`/`B` (±10) until the tick matches a real seconds hand, quit with
+`q`, and copy the printed value into line 155. TICKCAL's delay loop performs
+the same per-iteration work as the countdown loop in O1PRSNT.BAS, so the
+calibrated value transfers directly.
 
 ### If the countdown row displays in the wrong place
 
-The in-place update uses the Osborne 1 console cursor-addressing sequence
-(`ESC` `=` row column). If your display path (e.g. some composite/HDMI adapters)
-misplaces the countdown, set `CA% = 0` on line 157: the whole slide will repaint
-once per second instead (expect a brief blink each second in this mode).
+By default (`CA% = 1`, line 157) the countdown digits are written directly to
+video memory (0xF000), which is exact and flicker-free on any display path.
+If you ever see a stale or doubled countdown, set `CA% = 0`: the whole slide
+repaints once per second instead (expect a brief blink each second in this
+mode).
    
