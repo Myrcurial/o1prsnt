@@ -63,6 +63,7 @@ if len(seps) % 2 != 0:
 
 codes = set('LCRIBT')
 slide_no = 0
+deck_timers = 0
 i = 0
 n = len(lines)
 while i < n:
@@ -124,6 +125,7 @@ while i < n:
                     warn(f"slide {slide_no} line {lno}: {mm} minutes is a long countdown...")
     if timers > 1:
         warn(f"slide {slide_no}: {timers} timer lines; the program uses the LAST one")
+    deck_timers += timers
     last_row = fl + len(content) - 1
     if last_row > 22:
         warn(f"slide {slide_no}: content reaches row {last_row}; rows past 22 are "
@@ -133,6 +135,10 @@ while i < n:
     i = j + 1
 
 print(f"slides: {slide_no}")
+if deck_timers:
+    warn("deck uses countdown timers -- calibrate DL% on the target machine "
+         "with utilities/tickcal (MAME BIOS 1.44 = 95; real hardware differs "
+         "and may vary between Osborne 1 revisions)")
 print(f"input line endings: {'CRLF' if crlf_in else 'LF'} (output will be CRLF)")
 for w in warnings: print("warning:", w)
 for e in errors:   print("error:", e)
