@@ -11,7 +11,7 @@ You'll need ROMs -- you can get them here: https://archive.org/details/osborne-1
    - occ-7a3007-00-reva.rom
    - occ-v1.44.rom
 
-Keep the ROM files in a zip archive named `osborne1.zip` inside the `roms` folder -- MAME loads machine ROMs from `<rompath>/<machine>.zip`, so the final location should be `~/Documents/Osborne1/roms/osborne1.zip`.
+Keep the ROM files in a zip archive named `osborne1.zip` inside the `roms` folder -- MAME loads machine ROMs from `<rompath>/<machine>.zip`, so the final location should be `~/Documents/Osborne1/roms/osborne1.zip`. MAME also accepts the ROMs as an `osborne1/` directory, or as plain loose files sitting in the `roms` folder itself -- `utilities/headless-testing-harness/run-test.sh` copes with all three, so pick whichever suits your archive.
 
 ## Install Floppy Diskette Tools
 

@@ -15,8 +15,9 @@ The harness is a small Lua library (`o1harness.lua`) that MAME runs via its
 
 - macOS with Homebrew
 - `brew install mame`
-- Osborne 1 ROMs in `~/Documents/Osborne1/roms/` (either as `osborne1.zip` or
-  an `osborne1/` directory; see `docs/emulating-the-osborne-1.md`)
+- Osborne 1 ROMs in `~/Documents/Osborne1/roms/` — as an `osborne1.zip`, an
+  `osborne1/` directory, or just loose files in that folder (see
+  `docs/emulating-the-osborne-1.md`)
 - A bootable CP/M floppy image (`.imd`) to test with
 
 ## Running a test
